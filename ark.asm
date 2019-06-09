@@ -60,6 +60,25 @@ Start:
 	ld a, %10000001
 	ld [rLCDC], a
 
+.leftOrRight
+    ld a, $20 ; Setting bit 4 to 0 lets you read arrows
+    ld [$FF00], a
+    ld a, [$FF00]
+    ld a, [$FF00]
+    ld a, [$FF00]
+    ld a, [$FF00]
+    ld a, [$FF00]
+    ld a, [$FF00]
+    ld a, [$FF00]
+    cpl
+    and a, $01
+    or a
+    ld de, UpStr
+    jr z, .left
+    ld de, DownStr
+.left
+    jr .copyString
+
 .lockup
 	jr .lockup
 
@@ -74,3 +93,7 @@ SECTION "Hello World string", ROM0
 
 HelloWorldStr:
 	db "Hello World!", 0
+UpStr:
+    db "Up!", 0
+DownStr:
+    db "Down!", 0
