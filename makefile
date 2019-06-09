@@ -3,7 +3,7 @@ ark.gb: ark.o
 	rgbfix -v -p 0 ark.gb
 
 run: ark.gb
-	~/dev/gb-homebrew/gambatte/gambatte_qt/bin/gambatte_qt ark.gb
+	gambatte ark.gb
 
 ark.o: ark.asm hardware.inc
 	rgbasm -o ark.o ark.asm
