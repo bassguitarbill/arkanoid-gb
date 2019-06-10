@@ -73,6 +73,7 @@ Start:
     cpl
     and a, $01
     or a
+    ld hl, $9800
     ld de, UpStr
     jr z, .left
     ld de, DownStr
