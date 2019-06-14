@@ -1,10 +1,12 @@
 INCLUDE "hardware.inc"
 
+SECTION "vblank",ROM0[$40]
+    jp VBlankHandler
 
 SECTION "Header", ROM0[$100]
 
 EntryPoint:
-	di ; disable interrupts
+;	di ; disable interrupts
 	jp Start ; This area is too smol
 
 REPT $150 - $104
@@ -24,26 +26,26 @@ Start:
 	ld [rLCDC], a
 	; okay we're in VBlank, let's get to work
 
-	ld hl, $9000
-	ld de, FontTiles
-	ld bc, FontTilesEnd - FontTiles
-.copyFont
-	ld a, [de] ; grab a single byte from the source
-	ld [hli], a ; put it at the destination, $9000
-	inc de
-	dec bc
-	ld a, b ; dec bc doesn't update flags
-	or c
-	jr nz, .copyFont
+	ld hl, $8000
+    ld a, $FF
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
 
-	ld hl, $9800
-	ld de, HelloWorldStr
-.copyString
-	ld a, [de]
-	ld [hli], a
-	inc de
-	and a ; was the last byte $0?
-	jr nz, .copyString
+    ld a, $F0
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
 
 	; init display registers
 	ld a, %11100100
@@ -60,28 +62,52 @@ Start:
 	ld a, %10000001
 	ld [rLCDC], a
 
-.leftOrRight
-    ld a, $20 ; Setting bit 4 to 0 lets you read arrows
-    ld [$FF00], a
-    ld a, [$FF00]
-    ld a, [$FF00]
-    ld a, [$FF00]
-    ld a, [$FF00]
-    ld a, [$FF00]
-    ld a, [$FF00]
-    ld a, [$FF00]
-    cpl
-    and a, $01
-    or a
-    ld hl, $9800
-    ld de, UpStr
-    jr z, .left
-    ld de, DownStr
-.left
-    jr .copyString
-
 .lockup
+    halt
 	jr .lockup
+
+VBlankHandler:
+    call Draw
+    call Update
+    reti
+
+Draw:
+.drawPaddle
+    ld hl, $FE00 ; Sprite 0
+
+    ld [hl], $24
+    inc hl
+    ld [hl], $24
+    inc hl
+    ld [hl], $0
+    inc hl
+    ld [hl], $0
+    inc hl
+
+    ld [hl], $24; Sprite 1
+    inc hl
+    ld [hl], $2C
+    inc hl
+    ld [hl], $1
+    inc hl
+    ld [hl], $0
+    inc hl
+
+    ld [hl], $34; Sprite 2
+    inc hl
+    ld [hl], $24
+    inc hl
+    ld [hl], $0
+    inc hl
+    ld [hl], $0
+    inc hl
+    
+.drawBall
+    ret
+
+Update:
+    ret
+    
 
 SECTION "Font", ROM0
 
