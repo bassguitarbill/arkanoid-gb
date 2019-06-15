@@ -109,14 +109,12 @@ VBlankHandler:
 
 Draw:
 .drawPaddle
-    ld hl, $FE00 ; Sprite 0
+    ld hl, $FE02 ; Sprite 0
     
-ld a, [$FF80]
-
-    ld [hl], a
-    inc hl
-    ld [hl], $24
-    inc hl
+    ld a, [$FF82]
+    ld [$FE00], a
+    ld a, [$FF83]
+    ld [$FE01], a
     ld [hl], $0
     inc hl
     ld [hl], $0
@@ -144,11 +142,60 @@ ld a, [$FF80]
     ld hl, $FF80
     ld a, [hl]
     inc a
-    ld [$FF80], a
+    ;ld [$FF80], a
     ret
 
 Update:
+.getJoypad
+    ld hl, $FF00
+    ld [hl], %0001000 ; read arrows
+    ld a, [hl]
+    ld a, [hl]
+    ld a, [hl]
+    ld a, [hl]
+    ld a, [hl]
+    ld a, [hl]
+    cpl
+    ld [$FF81], a
+
+.moveBlock
+    ld b, a
+    and %00001000
+    jr nz, .moveDown
+    ld a, b
+    and %00000100
+    jr nz, .moveUp
+    ld a, b
+    and %00000010
+    jr nz, .moveLeft
+    ld a, b
+    and %00000001
+    jr nz, .moveRight
+    jr .doneMovingBlock
+
+.moveDown
+    ld a, [$FF82]
+    add 2
+    ld [$FF82], a
+    jr .doneMovingBlock
+.moveUp
+    ld a, [$FF82]
+    sub 2
+    ld [$FF82], a
+    jr .doneMovingBlock
+.moveLeft
+    ld a, [$FF83]
+    sub 2
+    ld [$FF83], a
+    jr .doneMovingBlock
+.moveRight
+    ld a, [$FF83]
+    add 2
+    ld [$FF83], a
+
+.doneMovingBlock    
     ret
+
     
 
 SECTION "Font", ROM0
