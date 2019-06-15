@@ -36,16 +36,48 @@ Start:
     ld [hli], a
     ld [hli], a
     ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
+    ld [hli], a
 
-    ld a, $F0
+    ld a, $FF
     ld [hli], a
+    cpl
     ld [hli], a
+    cpl
     ld [hli], a
+    cpl
     ld [hli], a
+    cpl
     ld [hli], a
+    cpl
     ld [hli], a
+    cpl
     ld [hli], a
+    cpl
     ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
+    ld [hli], a
+    cpl
 
 	; init display registers
 	ld a, %11100100
@@ -59,10 +91,14 @@ Start:
 	ld [rNR52], a
 
 	; turn screen on, show BG
-	ld a, %10000001
+	ld a, %10000011
 	ld [rLCDC], a
 
+    ld a, %00000001
+    ld [$FFFF], a
+
 .lockup
+    ei
     halt
 	jr .lockup
 
@@ -74,8 +110,10 @@ VBlankHandler:
 Draw:
 .drawPaddle
     ld hl, $FE00 ; Sprite 0
+    
+ld a, [$FF80]
 
-    ld [hl], $24
+    ld [hl], a
     inc hl
     ld [hl], $24
     inc hl
@@ -103,6 +141,10 @@ Draw:
     inc hl
     
 .drawBall
+    ld hl, $FF80
+    ld a, [hl]
+    inc a
+    ld [$FF80], a
     ret
 
 Update:
