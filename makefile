@@ -5,6 +5,9 @@ ark.gb: ark.o
 run: ark.gb
 	gambatte ark.gb
 
+debug: ark.gb
+	wine ~/dev/bgb/bgb64.exe ark.gb
+
 ark.o: ark.asm hardware.inc
 	rgbasm -o ark.o ark.asm
 
