@@ -82,6 +82,8 @@ Start:
 	; init display registers
 	ld a, %11100100
 	ld [rBGP], a
+	ld [rOBP0], a
+	ld [rOBP1], a
 
 	xor a
 	ld [rSCY], a
