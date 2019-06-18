@@ -115,30 +115,28 @@ Draw:
     
     ld a, [$FF82]
     ld [$FE00], a
+    ld [$FE04], a
+    ld [$FE08], a
+
     ld a, [$FF83]
     ld [$FE01], a
-    ld [hl], $0
-    inc hl
-    ld [hl], $0
-    inc hl
+    add 8
+    ld [$FE05], a
+    add 8
+    ld [$FE09], a
 
-    ld [hl], $24; Sprite 1
-    inc hl
-    ld [hl], $2C
-    inc hl
-    ld [hl], $1
-    inc hl
-    ld [hl], $0
-    inc hl
+    xor a
+    ld [$FE02], a
+    ld [$FE03], a
 
-    ld [hl], $34; Sprite 2
-    inc hl
-    ld [hl], $24
-    inc hl
-    ld [hl], $0
-    inc hl
-    ld [hl], $0
-    inc hl
+    ; ld [$FE06], $1
+    ld [$FE07], a
+
+    ld [$FE0A], a
+    ld [$FE0B], a
+
+    inc a
+    ld [$FE06], a
     
 .drawBall
     ld hl, $FF80
