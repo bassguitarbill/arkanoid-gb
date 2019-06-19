@@ -151,13 +151,22 @@ Draw:
     inc a
 
 .drawBall
+    ld hl, $FF84
     ld a, [$FF85] ; x
     srl a
+    bit 7
+    jr nz, .go1
+    add $80
+.go1
     srl a
     ld [$FE0C], a
     
     ld a, [$FF86] ; y
     srl a
+    bit 6
+    jr nz, .go2
+    add $80
+.go2
     srl a
     ld [$FE0D], a
 
@@ -211,7 +220,7 @@ Update:
 .calculateBallSpeed
     xor a
     ld c, a
-    ld a, [$FF84]
+    ld a, [$FF84] ; ball info
     and $0F ; Just get the lower 4
     cp $08
     jr c, .goingUp
@@ -238,12 +247,33 @@ Update:
     add de
     ld c, [hl] ; c is our vertical velocity!!
 .moveBall
+.moveX
     ld a, [$FF85] ; Ball x position
     add b
     ld [$FF85], a
+    jr nc, .moveY
+    ld hl, [$FF84]
+    bit 7 ; z is set if the high x bit is NOT set
+    jr nz, .collideX
+    set 7 ; we're now in the right half
+    jr .moveY
+.collideX
+    ;ld a, [$FF84]
+    ;and $0F
+    ;neg a
+    ;add 7
+    
+.moveY
     ld a, [$FF86] ; Ball y position
     add c
     ld [$FF86], a
+    jr nc, .doneMovingBall
+    ld hl, [$FF84]
+    bit 6 ; z is set if the high x bit is NOT set
+    jr nz, .collideY
+    set 6 ; we're now in the right half
+    jr .doneMovingBall
+.collideY
     
 .doneMovingBall
     ret
