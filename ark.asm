@@ -13,7 +13,13 @@ REPT $150 - $104
 	db 0
 ENDR
 
-Section "Game code", ROM0
+SECTION "Speed Table",ROM0[$1000]
+XSpeedTable:
+    db $01,$02,$03,$04
+YSpeedTable:
+    db $04,$03,$02,$01
+
+Section "Game code", ROM0[$0400]
 
 Start:
 	; Turn off the LCD
@@ -114,8 +120,6 @@ VBlankHandler:
 
 Draw:
 .drawPaddle
-    ld hl, $FE02 ; Sprite 0
-    
     ld a, $84
     ld [$FE00], a
     ld [$FE04], a
@@ -141,10 +145,26 @@ Draw:
     inc a
     ld [$FE06], a
     
-.drawBall
+.timer
     ld hl, $FF80
     ld a, [hl]
     inc a
+
+.drawBall
+    ld a, [$FF85] ; x
+    srl a
+    srl a
+    ld [$FE0C], a
+    
+    ld a, [$FF86] ; y
+    srl a
+    srl a
+    ld [$FE0D], a
+
+    xor a
+    ld [$FE0E], a
+    ld [$FE0F], a
+    
     ;ld [$FF80], a
     ret
 
@@ -186,22 +206,48 @@ Update:
     ld [$FF83], a
 
 .doneMovingPaddle    
+    ; great
+
+.calculateBallSpeed
+    xor a
+    ld c, a
+    ld a, [$FF84]
+    and $0F ; Just get the lower 4
+    cp $08
+    jr c, .goingUp
+    ld b, a
+    ld a, $0F
+    sub b
+.goingUp
+    ; a is now between 0 and 7
+    and $0F
+    cp $04
+    jr c, .goingRight
+    ld b, a
+    ld a, $08
+    sub b
+.goingRight
+    ; horizSpeed = [SpeedTable + a]
+    ; vertSpeed = [EndSpeedTable - a]
+    ld hl, XSpeedTable
+    ld d, $00
+    ld e, a
+    add de
+    ld b, [hl] ; b is our horizontal velocity!
+    ld hl, YSpeedTable
+    add de
+    ld c, [hl] ; c is our vertical velocity!!
+.moveBall
+    ld a, [$FF85] ; Ball x position
+    add b
+    ld [$FF85], a
+    ld a, [$FF86] ; Ball y position
+    add c
+    ld [$FF86], a
+    
+.doneMovingBall
     ret
 
-    
-
-SECTION "Font", ROM0
-
-FontTiles:
-INCBIN "font.chr"
-FontTilesEnd:
 
 
-SECTION "Hello World string", ROM0
 
-HelloWorldStr:
-	db "Hello World!", 0
-UpStr:
-    db "Up!", 0
-DownStr:
-    db "Down!", 0
