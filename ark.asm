@@ -154,7 +154,7 @@ Draw:
     ld hl, $FF84
     ld a, [$FF85] ; x
     srl a
-    bit 7
+    bit 7, [hl]
     jr nz, .go1
     add $80
 .go1
@@ -163,7 +163,7 @@ Draw:
     
     ld a, [$FF86] ; y
     srl a
-    bit 6
+    bit 6, [hl]
     jr nz, .go2
     add $80
 .go2
@@ -252,10 +252,10 @@ Update:
     add b
     ld [$FF85], a
     jr nc, .moveY
-    ld hl, [$FF84]
-    bit 7 ; z is set if the high x bit is NOT set
+    ld hl, $FF84
+    bit 7, [hl] ; z is set if the high x bit is NOT set
     jr nz, .collideX
-    set 7 ; we're now in the right half
+    set 7, [hl] ; we're now in the right half
     jr .moveY
 .collideX
     ;ld a, [$FF84]
@@ -268,10 +268,11 @@ Update:
     add c
     ld [$FF86], a
     jr nc, .doneMovingBall
-    ld hl, [$FF84]
-    bit 6 ; z is set if the high x bit is NOT set
+    ld hl, $FF84
+    ld c, [hl]
+    bit 6, [hl] ; z is set if the high x bit is NOT set
     jr nz, .collideY
-    set 6 ; we're now in the right half
+    set 6, [hl] ; we're now in the right half
     jr .doneMovingBall
 .collideY
     
