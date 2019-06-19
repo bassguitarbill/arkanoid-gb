@@ -99,6 +99,9 @@ Start:
     ld a, %00000001
     ld [$FFFF], a
 
+    ld a, $50 ; Middle of the screen or so
+    ld [$FF83], a
+
 .lockup
     ei
     halt
@@ -113,7 +116,7 @@ Draw:
 .drawPaddle
     ld hl, $FE02 ; Sprite 0
     
-    ld a, [$FF82]
+    ld a, $84
     ld [$FE00], a
     ld [$FE04], a
     ld [$FE08], a
@@ -157,43 +160,32 @@ Update:
     ld a, [hl]
     cpl
     ld [$FF81], a
-
-.moveBlock
     ld b, a
-    and %00001000
-    jr nz, .moveDown
-    ld a, b
-    and %00000100
-    jr nz, .moveUp
+
+.movePaddle
     ld a, b
     and %00000010
     jr nz, .moveLeft
     ld a, b
     and %00000001
     jr nz, .moveRight
-    jr .doneMovingBlock
+    jr .doneMovingPaddle
 
-.moveDown
-    ld a, [$FF82]
-    add 2
-    ld [$FF82], a
-    jr .doneMovingBlock
-.moveUp
-    ld a, [$FF82]
-    sub 2
-    ld [$FF82], a
-    jr .doneMovingBlock
 .moveLeft
     ld a, [$FF83]
-    sub 2
+    sub 1
+    cp $08
+    jr c, .doneMovingPaddle
     ld [$FF83], a
-    jr .doneMovingBlock
+    jr .doneMovingPaddle
 .moveRight
     ld a, [$FF83]
-    add 2
+    add 1
+    cp $92
+    jr nc, .doneMovingPaddle
     ld [$FF83], a
 
-.doneMovingBlock    
+.doneMovingPaddle    
     ret
 
     
