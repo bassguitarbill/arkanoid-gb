@@ -155,7 +155,7 @@ Draw:
     ld a, [$FF85] ; x
     srl a
     bit 7, [hl]
-    jr nz, .go1
+    jr z, .go1
     add $80
 .go1
     srl a
@@ -164,7 +164,7 @@ Draw:
     ld a, [$FF86] ; y
     srl a
     bit 6, [hl]
-    jr nz, .go2
+    jr z, .go2
     add $80
 .go2
     srl a
